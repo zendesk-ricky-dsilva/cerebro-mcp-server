@@ -388,6 +388,11 @@ The server provides detailed error messages for:
 - `github.com/mark3labs/mcp-go` - MCP protocol implementation
 - Standard Go libraries for HTTP, JSON, and networking
 
+### Building
+```bash
+go build -o cerebro-mcp-server .
+```
+
 **Using Makefile (Recommended):**
 ```bash
 # Build the binary
