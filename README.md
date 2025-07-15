@@ -372,7 +372,13 @@ The server provides detailed error messages for:
 ### Project Structure
 ```
 .
-├── main.go                      # Main server implementation
+├── main.go                      # Main server and HTTP handlers
+├── types.go                     # Type definitions
+├── config.go                    # Configuration management
+├── client.go                    # Cerebro API client
+├── service.go                   # Business logic
+├── validation.go                # Input validation
+├── errors.go                    # Custom error types
 ├── go.mod                       # Go module dependencies
 ├── go.sum                       # Dependency checksums
 ├── Makefile                     # Build and test automation
@@ -381,7 +387,6 @@ The server provides detailed error messages for:
 └── examples/                    # Example API responses
     ├── project_dependencies_response_payload.json
     └── projects_response_payload.json
-
 ```
 
 ### Dependencies
