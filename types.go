@@ -34,6 +34,8 @@ type Project struct {
 	ProjectStakeholderOwner         string   `json:"project_stakeholder_owner_name"`
 	ProjectStakeholderOncall        string   `json:"project_stakeholder_oncall_name"`
 	DependentProjectDependenciesIds []int    `json:"dependent_project_dependencies_ids"`
+	PrimaryDeploymentUrl            string   `json:"link_deployment_url"`
+	AdditionalDeploymentUrls        []string `json:"link_deployment_urls"`
 }
 
 // ProjectDependency represents a project dependency in the API response

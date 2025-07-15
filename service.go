@@ -154,7 +154,14 @@ func (s *ProjectService) formatProjectDetails(project Project, permalink string)
 	result += fmt.Sprintf("**Project Name:** %s\n", project.Name)
 	result += fmt.Sprintf("**Description:** %s\n", project.Description)
 	result += fmt.Sprintf("**Category:** %s\n", project.Category)
-	result += fmt.Sprintf("**Calculated Criticality Tier:** %s\n", project.CalculatedCriticalityTier)
+
+	// Use CalculatedCriticalityTier if available, otherwise use CriticalityTier
+	if project.CalculatedCriticalityTier == "Unknown" {
+		result += fmt.Sprintf("**Criticality Tier:** %s\n", project.CriticalityTier)
+	} else {
+		result += fmt.Sprintf("**Criticality Tier:** %s\n", project.CalculatedCriticalityTier)
+	}
+
 	result += fmt.Sprintf("**Release State:** %s\n", project.ReleaseState)
 	result += fmt.Sprintf("**Owner:** %s\n", project.ProjectStakeholderOwner)
 	result += fmt.Sprintf("**Slack Channel:** %s\n", project.SlackChannel)
@@ -165,6 +172,33 @@ func (s *ProjectService) formatProjectDetails(project Project, permalink string)
 		result += fmt.Sprintf("\n**Project Repository URLs (%d):**\n", len(project.ProjectRepositoryURLs))
 		for i, repoURL := range project.ProjectRepositoryURLs {
 			result += fmt.Sprintf("%d. %s\n", i+1, repoURL)
+		}
+	}
+
+	// Collect all deployment URLs and remove duplicates
+	var allDeploymentUrls []string
+	urlSet := make(map[string]bool)
+
+	// Add primary deployment URL
+	if project.PrimaryDeploymentUrl != "" && !urlSet[project.PrimaryDeploymentUrl] {
+		allDeploymentUrls = append(allDeploymentUrls, project.PrimaryDeploymentUrl)
+		urlSet[project.PrimaryDeploymentUrl] = true
+	}
+
+	// Add additional deployment URLs
+	for _, depURL := range project.AdditionalDeploymentUrls {
+		if depURL != "" && !urlSet[depURL] {
+			allDeploymentUrls = append(allDeploymentUrls, depURL)
+			urlSet[depURL] = true
+		}
+	}
+
+	if len(allDeploymentUrls) == 0 {
+		result += "No deployment URLs found.\n"
+	} else {
+		result += fmt.Sprintf("\n**Project Deployment URLs (%d):**\n", len(allDeploymentUrls))
+		for i, depURL := range allDeploymentUrls {
+			result += fmt.Sprintf("%d. %s\n", i+1, depURL)
 		}
 	}
 
@@ -200,11 +234,56 @@ func (s *ProjectService) formatDependencies(project Project, dependencyResults [
 		result += fmt.Sprintf("- **Permalink:** %s\n", providingProject.Permalink)
 		result += fmt.Sprintf("- **Description:** %s\n", providingProject.Description)
 		result += fmt.Sprintf("- **Category:** %s\n", providingProject.Category)
-		result += fmt.Sprintf("- **Criticality Tier:** %s\n", providingProject.CalculatedCriticalityTier)
+
+		// Use CalculatedCriticalityTier if available, otherwise use CriticalityTier
+		if providingProject.CalculatedCriticalityTier == "Unknown" {
+			result += fmt.Sprintf("**Criticality Tier:** %s\n", providingProject.CriticalityTier)
+		} else {
+			result += fmt.Sprintf("**Criticality Tier:** %s\n", providingProject.CalculatedCriticalityTier)
+		}
+
 		result += fmt.Sprintf("- **Release State:** %s\n", providingProject.ReleaseState)
 		result += fmt.Sprintf("- **Owner Team:** %s\n", providingProject.ProjectStakeholderOwner)
 		result += fmt.Sprintf("- **Slack Channel:** %s\n", providingProject.SlackChannel)
+
+		if len(providingProject.ProjectRepositoryURLs) == 0 {
+			result += "No project repository URLs found.\n"
+		} else {
+			result += fmt.Sprintf("\n**Project Repository URLs (%d):**\n", len(providingProject.ProjectRepositoryURLs))
+			for i, repoURL := range providingProject.ProjectRepositoryURLs {
+				result += fmt.Sprintf("%d. %s\n", i+1, repoURL)
+			}
+		}
+
+		// Collect all deployment URLs and remove duplicates
+		var allDeploymentUrls []string
+		urlSet := make(map[string]bool)
+
+		// Add primary deployment URL
+		if providingProject.PrimaryDeploymentUrl != "" && !urlSet[providingProject.PrimaryDeploymentUrl] {
+			allDeploymentUrls = append(allDeploymentUrls, providingProject.PrimaryDeploymentUrl)
+			urlSet[providingProject.PrimaryDeploymentUrl] = true
+		}
+
+		// Add additional deployment URLs
+		for _, depURL := range providingProject.AdditionalDeploymentUrls {
+			if depURL != "" && !urlSet[depURL] {
+				allDeploymentUrls = append(allDeploymentUrls, depURL)
+				urlSet[depURL] = true
+			}
+		}
+
+		if len(allDeploymentUrls) == 0 {
+			result += "No deployment URLs found.\n"
+		} else {
+			result += fmt.Sprintf("\n**Project Deployment URLs (%d):**\n", len(allDeploymentUrls))
+			for i, depURL := range allDeploymentUrls {
+				result += fmt.Sprintf("%d. %s\n", i+1, depURL)
+			}
+		}
+
 		result += fmt.Sprintf("- **Optional Dependency:** %t\n", res.dep.Optional)
+
 		if res.dep.Description != "" {
 			result += fmt.Sprintf("- **Dependency Description:** %s\n", res.dep.Description)
 		}
