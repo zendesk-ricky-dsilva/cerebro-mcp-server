@@ -266,80 +266,94 @@ Contains dependency relationship information including:
 
 ### Project Details Example
 
-When querying for `telemetry-pipeline`, you might get:
+When querying for `example-project`, you might get:
 
 ```
-# Project Details for: telemetry-pipeline
+# Project Details for: example-project
 
-**Project Name:** telemetry-pipeline
-**Description:** Observability pipeline log forwarder
-**Category:** Infrastructure
-**Deploy Target:** Each Pod
-**Runs On:** Kubernetes
-**Slack Channel:** ask-sre
-**Started On:** 2019-12-11
+**Project Name:** Example Project
+**Description:** Sample project description
+**Category:** Service
+**Deploy Target:** Kubernetes
+**Runs On:** Production
+**Slack Channel:** example-team
+**Started On:** 2023-01-15
 
-## Repositories with kube_project = 'telemetry-pipeline'
+## Repositories with kube_project = 'example-project'
 
 Found 2 matching repositories:
 
-### 1. datadog-logs-go
-- **URL:** https://github.com/zendesk/datadog-logs-go
-- **Permalink:** datadog-logs-go
+### 1. example-service
+- **URL:** https://github.com/company/example-service
+- **Permalink:** example-service
 - **Category:** Service
-- **Started On:** 2019-12-11
+- **Started On:** 2023-01-15
 - **Archived:** false
 - **Last Updated:** 2025-07-05T00:05:04.000Z
 
-### 2. vector-daemonset
-- **URL:** https://github.com/zendesk/vector-daemonset
-- **Permalink:** vector-daemonset
+### 2. example-worker
+- **URL:** https://github.com/company/example-worker
+- **Permalink:** example-worker
 - **Category:** Service
-- **Started On:** 2021-06-16
+- **Started On:** 2023-06-16
 - **Archived:** false
 - **Last Updated:** 2025-07-01T00:09:12.000Z
 ```
 
 ### Project Dependencies Example
 
-When querying dependencies for `classic`, you might get:
+When querying dependencies for `example-project`, you might get:
 
 ```
-# Dependencies for Project: Classic
+# Dependencies for Project: Example Project
 
-**Project ID:** 9
-**Permalink:** classic
-**Description:** The Support API application and oldest, largest app at Zendesk
+**Project ID:** 100
+**Permalink:** example-project
+**Description:** A sample project for demonstration purposes
 
-## Dependencies (83)
+## Dependencies (3)
 
-### 1. Samson
-- **Dependency ID:** 4
-- **Providing Project ID:** 8
-- **Permalink:** samson
-- **Description:** Web interface for deploying code
-- **Category:** Infrastructure
-- **Criticality Tier:** Tier 1
-- **Release State:** GA
-- **Owner Team:** Platform Core
-- **Slack Channel:** samson-dev
-- **Optional Dependency:** false
-- **Dependency Created:** 2017-04-25T05:16:09.000Z
-- **Last Updated:** 2017-05-11T15:55:27.000Z
-
-### 2. Zendesk Auth
-- **Dependency ID:** 3
-- **Providing Project ID:** 10
-- **Permalink:** zendesk-auth
+### 1. Authentication Service
+- **Dependency ID:** 1
+- **Providing Project ID:** 200
+- **Permalink:** auth-service
 - **Description:** Authentication and authorization service
 - **Category:** Service
+- **Criticality Tier:** Tier 1
+- **Release State:** GA
+- **Owner Team:** Platform Team
+- **Slack Channel:** platform-support
+- **Optional Dependency:** false
+- **Dependency Created:** 2023-01-15T10:00:00.000Z
+- **Last Updated:** 2023-06-01T15:30:00.000Z
+
+### 2. Database Service
+- **Dependency ID:** 2
+- **Providing Project ID:** 300
+- **Permalink:** db-service
+- **Description:** Database management service
+- **Category:** Infrastructure
 - **Criticality Tier:** Tier 0
 - **Release State:** GA
-- **Owner Team:** Platform Security
-- **Slack Channel:** auth-dev
+- **Owner Team:** Data Team
+- **Slack Channel:** data-support
 - **Optional Dependency:** false
-- **Dependency Created:** 2017-04-25T05:15:49.000Z
-- **Last Updated:** 2017-05-11T15:55:27.000Z
+- **Dependency Created:** 2023-01-15T10:05:00.000Z
+- **Last Updated:** 2023-06-01T15:35:00.000Z
+
+### 3. Logging Service
+- **Dependency ID:** 3
+- **Providing Project ID:** 400
+- **Permalink:** logging-service
+- **Description:** Centralized logging service
+- **Category:** Infrastructure
+- **Criticality Tier:** Tier 2
+- **Release State:** GA
+- **Owner Team:** Platform Team
+- **Slack Channel:** platform-support
+- **Optional Dependency:** true
+- **Dependency Created:** 2023-02-01T09:00:00.000Z
+- **Last Updated:** 2023-06-15T14:20:00.000Z
 
 [... additional dependencies ...]
 ```
