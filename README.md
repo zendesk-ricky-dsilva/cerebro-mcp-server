@@ -378,20 +378,15 @@ The server provides detailed error messages for:
 ├── Makefile                     # Build and test automation
 ├── test_dependencies.sh         # Dependencies endpoint test script
 ├── README.md                    # This documentation
-├── examples/                    # Example API responses
-│   ├── project_dependencies_response_payload.json
-│   └── projects_response_payload.json
-└── api/                         # API documentation
+└── examples/                    # Example API responses
+    ├── project_dependencies_response_payload.json
+    └── projects_response_payload.json
+
 ```
 
 ### Dependencies
 - `github.com/mark3labs/mcp-go` - MCP protocol implementation
 - Standard Go libraries for HTTP, JSON, and networking
-
-### Building
-```bash
-go build -o cerebro-mcp-server .
-```
 
 **Using Makefile (Recommended):**
 ```bash
