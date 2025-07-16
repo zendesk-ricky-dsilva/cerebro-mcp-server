@@ -60,6 +60,7 @@ make help
 ```
 
 **Quick Start with Makefile:**
+
 ```bash
 # Build and test in one command
 make check
@@ -79,6 +80,7 @@ export CEREBRO_TOKEN="your-cerebro-api-token"
 ## Usage
 
 ### MCP Mode (Default)
+
 Start the server in MCP mode for integration with Claude Desktop or other MCP clients:
 
 ```bash
@@ -86,11 +88,13 @@ Start the server in MCP mode for integration with Claude Desktop or other MCP cl
 ```
 
 **Using Makefile:**
+
 ```bash
 make run-mcp
 ```
 
 ### HTTP Mode
+
 Start the server in HTTP mode to call it via REST API:
 
 ```bash
@@ -98,6 +102,7 @@ HTTP_MODE=true ./cerebro-mcp-server
 ```
 
 **Using Makefile:**
+
 ```bash
 make run-http
 ```
@@ -107,6 +112,7 @@ The server will start on port 8080 and accept POST requests to `/mcp`.
 #### HTTP API Example
 
 Request format for project details:
+
 ```bash
 curl -X POST http://localhost:8080/mcp \
   -H "Content-Type: application/json" \
@@ -119,6 +125,7 @@ curl -X POST http://localhost:8080/mcp \
 ```
 
 Request format for project dependencies:
+
 ```bash
 curl -X POST http://localhost:8080/mcp \
   -H "Content-Type: application/json" \
@@ -131,6 +138,7 @@ curl -X POST http://localhost:8080/mcp \
 ```
 
 Response format:
+
 ```json
 {
   "success": true,
@@ -146,11 +154,24 @@ Response format:
 ```
 
 Error response:
+
 ```json
 {
   "success": false,
   "error": "Tool not found: invalid_tool"
 }
+```
+
+## Integration with kubectl-ai
+
+Add this configuration to your [kubectl-ai](https://github.com/GoogleCloudPlatform/kubectl-ai) config file:
+
+```yaml
+servers:
+  - name: cerebro-mcp-server
+    command: /path/to/your/cerebro-mcp-server
+    env:
+      CEREBRO_TOKEN: your-cerebro-api-token
 ```
 
 ## Integration with Claude Desktop
@@ -175,9 +196,11 @@ Add this configuration to your Claude Desktop config file:
 The server integrates with the Cerebro API at `https://cerebro.zende.sk/projects.json`.
 
 ### Authentication
+
 Uses token-based authentication via the `Authorization: Token <token>` header.
 
 ### Query Parameters
+
 - `search[permalink]`: Filter projects by permalink
 - `search[id]`: Filter projects by ID
 - `includes`: Include related data (e.g., "repositories", "project_dependencies")
@@ -195,6 +218,7 @@ The `project_get_dependencies` tool implements asynchronous API calls for optima
 - **Error Handling**: Individual API failures don't block other dependency fetches
 
 **Performance Impact:**
+
 - For a project with 50 dependencies: Sequential = ~15 seconds, Async = ~1-2 seconds
 - Response time scales with the slowest individual API call rather than the sum of all calls
 - Particularly beneficial for projects with many dependencies (like the "classic" project with 80+ dependencies)
@@ -209,30 +233,35 @@ The `project_get_dependencies` tool implements asynchronous API calls for optima
 
 ### project_get_details
 
-Retrieves detailed information about a project and its associated repositories.
+Retrieves detailed information about a project.
 
 **Parameters:**
+
 - `project_permalink` (required): The permalink of the project to retrieve
 
 **Returns:**
-- Project metadata (name, description, category, etc.)
-- List of repositories where `kube_project` matches the project permalink
-- Repository details (URL, category, status, etc.)
+
+- Project metadata (name, description, category, criticality tier, release state, owner, etc.)
+- Project repository URLs (URLs associated with the project)
+- Project deployment URLs (deduplicated primary and additional deployment URLs)
 
 ### project_get_dependencies
 
 Retrieves comprehensive dependency information for a project using asynchronous API calls for optimal performance.
 
 **Parameters:**
+
 - `project_permalink` (required): The permalink of the project to retrieve dependencies for
 
 **Performance Features:**
+
 - **Asynchronous Processing**: All dependency details are fetched concurrently using Go routines
 - **Parallel API Calls**: Multiple providing projects are queried simultaneously
 - **Maintained Order**: Results are presented in the original dependency order
 - **Error Resilience**: Individual API failures don't block other dependency fetches
 
 **Returns:**
+
 - Project basic information (ID, name, permalink, description)
 - List of dependencies with detailed information for each:
   - Providing project details (name, category, criticality tier, owner, etc.)
@@ -242,7 +271,9 @@ Retrieves comprehensive dependency information for a project using asynchronous 
 ## Data Structures
 
 ### Project
+
 Contains project metadata including:
+
 - Basic info (ID, name, permalink, description)
 - Configuration (category, deploy target, runs on)
 - Status information (criticality tier, release state)
@@ -250,14 +281,18 @@ Contains project metadata including:
 - Dependencies (dependent project dependencies IDs)
 
 ### Repository
+
 Contains repository information including:
+
 - Basic info (ID, name, URL, permalink)
 - Metadata (category, created/updated dates)
 - Status (archived, deprecated)
 - **kube_project**: The field used for filtering
 
 ### ProjectDependency
+
 Contains dependency relationship information including:
+
 - Relationship IDs (ID, dependent project ID, providing project ID)
 - Metadata (description, optional flag)
 - Timestamps (created at, updated at, deleted at)
@@ -274,30 +309,18 @@ When querying for `example-project`, you might get:
 **Project Name:** Example Project
 **Description:** Sample project description
 **Category:** Service
-**Deploy Target:** Kubernetes
-**Runs On:** Production
+**Criticality Tier:** Tier 1
+**Release State:** GA
+**Owner:** Platform Team
 **Slack Channel:** example-team
-**Started On:** 2023-01-15
 
-## Repositories with kube_project = 'example-project'
+**Project Repository URLs (2):**
+1. https://github.com/company/example-service
+2. https://github.com/company/example-worker
 
-Found 2 matching repositories:
-
-### 1. example-service
-- **URL:** https://github.com/company/example-service
-- **Permalink:** example-service
-- **Category:** Service
-- **Started On:** 2023-01-15
-- **Archived:** false
-- **Last Updated:** 2025-07-05T00:05:04.000Z
-
-### 2. example-worker
-- **URL:** https://github.com/company/example-worker
-- **Permalink:** example-worker
-- **Category:** Service
-- **Started On:** 2023-06-16
-- **Archived:** false
-- **Last Updated:** 2025-07-01T00:09:12.000Z
+**Project Deployment URLs (2):**
+1. https://example-project.prod.company.com
+2. https://example-project.staging.company.com
 ```
 
 ### Project Dependencies Example
@@ -323,9 +346,17 @@ When querying dependencies for `example-project`, you might get:
 - **Release State:** GA
 - **Owner Team:** Platform Team
 - **Slack Channel:** platform-support
+
+**Project Repository URLs (2):**
+1. https://github.com/company/auth-service
+2. https://github.com/company/auth-client
+
+**Project Deployment URLs (2):**
+1. https://auth-service.prod.company.com
+2. https://auth-service.staging.company.com
+
 - **Optional Dependency:** false
-- **Dependency Created:** 2023-01-15T10:00:00.000Z
-- **Last Updated:** 2023-06-01T15:30:00.000Z
+- **Dependency Description:** Required for user authentication
 
 ### 2. Database Service
 - **Dependency ID:** 2
@@ -337,9 +368,14 @@ When querying dependencies for `example-project`, you might get:
 - **Release State:** GA
 - **Owner Team:** Data Team
 - **Slack Channel:** data-support
+
+**Project Repository URLs (1):**
+1. https://github.com/company/db-service
+
+**Project Deployment URLs (1):**
+1. https://db-service.prod.company.com
+
 - **Optional Dependency:** false
-- **Dependency Created:** 2023-01-15T10:05:00.000Z
-- **Last Updated:** 2023-06-01T15:35:00.000Z
 
 ### 3. Logging Service
 - **Dependency ID:** 3
@@ -351,16 +387,19 @@ When querying dependencies for `example-project`, you might get:
 - **Release State:** GA
 - **Owner Team:** Platform Team
 - **Slack Channel:** platform-support
-- **Optional Dependency:** true
-- **Dependency Created:** 2023-02-01T09:00:00.000Z
-- **Last Updated:** 2023-06-15T14:20:00.000Z
 
-[... additional dependencies ...]
+No project repository URLs found.
+No deployment URLs found.
+
+- **Optional Dependency:** true
+- **Dependency Description:** Optional logging integration
+
 ```
 
 ## Error Handling
 
 The server provides detailed error messages for:
+
 - Missing or invalid API tokens
 - Network connectivity issues
 - Invalid project permalinks
@@ -370,6 +409,7 @@ The server provides detailed error messages for:
 ## Development
 
 ### Project Structure
+
 ```
 .
 ├── main.go                      # Main server and HTTP handlers
@@ -390,15 +430,18 @@ The server provides detailed error messages for:
 ```
 
 ### Dependencies
+
 - `github.com/mark3labs/mcp-go` - MCP protocol implementation
 - Standard Go libraries for HTTP, JSON, and networking
 
 ### Building
+
 ```bash
 go build -o cerebro-mcp-server .
 ```
 
 **Using Makefile (Recommended):**
+
 ```bash
 # Build the binary
 make build
@@ -411,6 +454,7 @@ make clean build
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
 make test
@@ -426,39 +470,44 @@ make run-http
 
 ### Available Makefile Targets
 
-| Target | Description |
-|--------|-------------|
-| `build` | Build the Go binary |
-| `test` | Build and run tests |
-| `clean` | Remove build artifacts |
-| `deps` | Install Go dependencies |
-| `run-http` | Run server in HTTP mode |
-| `run-mcp` | Run server in MCP mode |
-| `fmt` | Format Go code |
-| `vet` | Run go vet |
-| `check` | Run all checks (fmt, vet, build, test) |
-| `help` | Show available targets |
+| Target     | Description                            |
+| ---------- | -------------------------------------- |
+| `build`    | Build the Go binary                    |
+| `test`     | Build and run tests                    |
+| `clean`    | Remove build artifacts                 |
+| `deps`     | Install Go dependencies                |
+| `run-http` | Run server in HTTP mode                |
+| `run-mcp`  | Run server in MCP mode                 |
+| `fmt`      | Format Go code                         |
+| `vet`      | Run go vet                             |
+| `check`    | Run all checks (fmt, vet, build, test) |
+| `help`     | Show available targets                 |
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **"CEREBRO_TOKEN environment variable is required"**
+
    - Set the `CEREBRO_TOKEN` environment variable with your API token
 
 2. **"failed to execute request"**
+
    - Check network connectivity to `https://cerebro.zende.sk`
    - Verify your API token is valid
 
 3. **"API request failed with status 401"**
+
    - Your API token may be invalid or expired
    - Contact your administrator for a new token
 
 4. **"No repositories found with matching kube_project"**
+
    - The project exists but has no repositories with matching `kube_project` field
    - Verify the project permalink is correct
 
 5. **"No dependencies found for this project"**
+
    - The project exists but has no dependencies defined in Cerebro
    - This is normal for standalone projects or leaf nodes in the dependency graph
 
